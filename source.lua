@@ -1,5 +1,5 @@
 --! Nanocore Internal UI
---! Version: 3.2
+--! Version: 3.3
 --! Copyright (c) 2024 ttwiz_z
 
 
@@ -22,9 +22,9 @@ end)
 
 --? Constants
 
-local TweenService = game:GetService("TweenService")
 local ExecutorTweenInfo = TweenInfo.new(0.075)
 local StrokeTweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+
 local ButtonHover = Color3.fromRGB(120, 120, 120)
 local ButtonDown = Color3.fromRGB(170, 170, 170)
 
@@ -70,7 +70,7 @@ end
 
 local function Tween(Object, TweenInfo, Properties)
     if Object and typeof(Object) == "Instance" and TweenInfo and typeof(TweenInfo) == "TweenInfo" and Properties and type(Properties) == "table" then
-        TweenService:Create(Object, TweenInfo, Properties):Play()
+        game:GetService("TweenService"):Create(Object, TweenInfo, Properties):Play()
     end
 end
 
