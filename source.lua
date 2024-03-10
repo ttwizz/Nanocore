@@ -1,5 +1,5 @@
 --! Nanocore Internal UI
---! Version: 3.0
+--! Version: 3.1
 --! Copyright (c) 2024 ttwiz_z
 
 
@@ -5839,6 +5839,7 @@ luaX:init()
 local LuaState = {}
 
 local _script_ = script
+script = nil
 if _script_ then
     _script_.Parent = nil
     _script_ = nil
