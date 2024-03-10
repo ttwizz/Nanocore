@@ -1,9 +1,32 @@
 --! Nanocore Internal UI
---! Version: 3.1
+--! Version: 3.2
 --! Copyright (c) 2024 ttwiz_z
 
 
---? Instances
+
+--? Script Hider
+
+pcall(function()
+    local _script_ = script
+    if _script_ then
+        script = nil
+        _script_.Parent = nil
+        _script_ = nil
+        getfenv().script = nil
+        for _ = 0, 1 do
+            getfenv(_).script = nil
+        end
+    end
+end)
+
+
+--? Constants
+
+local TweenService = game:GetService("TweenService")
+local ExecutorTweenInfo = TweenInfo.new(0.075)
+local StrokeTweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+local ButtonHover = Color3.fromRGB(120, 120, 120)
+local ButtonDown = Color3.fromRGB(170, 170, 170)
 
 local Executor = Instance.new("CanvasGroup")
 local UICorner = Instance.new("UICorner")
@@ -45,7 +68,11 @@ local function AutoRename(Object)
     end
 end
 
-local TweenService = game:GetService("TweenService")
+local function Tween(Object, TweenInfo, Properties)
+    if Object and typeof(Object) == "Instance" and TweenInfo and typeof(TweenInfo) == "TweenInfo" and Properties and type(Properties) == "table" then
+        TweenService:Create(Object, TweenInfo, Properties):Play()
+    end
+end
 
 local function SmoothDrag(Object)
     if Object and type(Object) == "userdata" then
@@ -54,7 +81,7 @@ local function SmoothDrag(Object)
         local function Update(Key)
             local Delta = Key.Position - Start
             local NewPosition = UDim2.new(StartPosition.X.Scale, StartPosition.X.Offset + Delta.X, StartPosition.Y.Scale, StartPosition.Y.Offset + Delta.Y)
-            TweenService:Create(Object, TweenInfo.new(0.075), {Position = NewPosition}):Play()
+            Tween(Object, ExecutorTweenInfo, {Position = NewPosition})
         end
         Object.InputBegan:Connect(function(NewInput)
             if (NewInput.UserInputType == Enum.UserInputType.MouseButton1 or NewInput.UserInputType == Enum.UserInputType.Touch) and not UserInputService:GetFocusedTextBox() then
@@ -5836,33 +5863,22 @@ end
 --? Initialization
 
 luaX:init()
+
 local LuaState = {}
 
-local _script_ = script
-script = nil
-if _script_ then
-    _script_.Parent = nil
-    _script_ = nil
-end
-getfenv().script = nil
-for _ = 0, 1 do
-    getfenv(_).script = nil
-end
-
-local function ExecuteCode(str,env)
-    local f, writer, buff
+local function ExecuteCode(str, env)
+    local f, writer, buff = nil, nil, nil
     env = env or getfenv(2)
     local ran, error = xpcall(function()
         local zio = luaZ:init(luaZ:make_getS(str), nil)
-        if not zio then return end
+        if not zio then return nil, error end
         local func = luaY:parser(LuaState, zio, nil, "NanocoreVM")
         writer, buff = luaU:make_setS()
         luaU:dump(LuaState, func, writer, buff)
         f = load_lua_func(buff.data, env)
     end, function(err)
-        return `{err}\n\n--- Loadstring Stacktrace Begin --- \n{debug.traceback("",2)}\n--- Loadstring Stacktrace End --- \n`
+        return string.format("%s\n\n--- Loadstring Stacktrace Begin --- \n%s\n--- Loadstring Stacktrace End --- \n", err, debug.traceback("", 2))
     end)
-
     if ran then
         return f, buff.data
     else
@@ -5871,7 +5887,7 @@ local function ExecuteCode(str,env)
 end
 
 
---? Properties
+--? Configuration
 
 task.spawn(AutoRename, Executor)
 local Setup = pcall(function()
@@ -6038,44 +6054,37 @@ end
 GUID = nil
 EQ = false
 
-task.spawn(function()
-    local ButtonHover = Color3.fromRGB(120, 120, 120)
-    local ButtonDown = Color3.fromRGB(170, 170, 170)
-    local TweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-    local function Tween(Object, Properties)
-        TweenService:Create(Object, TweenInfo, Properties):Play()
+local Activated = {
+    Execute = function()
+        xpcall(function()
+            getfenv().loadstring(Content.Text)()
+        end, function(Error)
+            warn(Error)
+        end)
+    end,
+    Clear = function()
+        Content.Text = ""
     end
-    local Activated = {
-        Execute = function()
-            xpcall(function()
-                getfenv().loadstring(Content.Text)()
-            end, function(Error)
-                warn(Error)
-            end)
-        end,
-        Clear = function()
-            Content.Text = ""
-        end
-    }
-    for _, Button in next, Buttons:GetChildren() do
-        if Button:IsA("TextButton") then
-            Button.AutoButtonColor = false
-            local Stroke = Button:FindFirstChildWhichIsA("UIStroke")
-            Button.MouseEnter:Connect(function()
-                Stroke.Transparency = 1
-                Stroke.Color = ButtonHover
-                Tween(Stroke, {Transparency = 0})
-            end)
-            Button.MouseLeave:Connect(function()
-                Tween(Stroke, {Transparency = 1})
-            end)
-            Button.MouseButton1Down:Connect(function()
-                Tween(Stroke, {Color = ButtonDown})
-            end)
-            Button.MouseButton1Up:Connect(function()
-                Tween(Stroke, {Color = ButtonHover})
-            end)
-            Button.Activated:Connect(Activated[Button.Text])
-        end
+}
+
+for _, Button in next, Buttons:GetChildren() do
+    if Button:IsA("TextButton") then
+        Button.AutoButtonColor = false
+        local Stroke = Button:FindFirstChildWhichIsA("UIStroke")
+        Button.MouseEnter:Connect(function()
+            Stroke.Transparency = 1
+            Stroke.Color = ButtonHover
+            Tween(Stroke, StrokeTweenInfo, {Transparency = 0})
+        end)
+        Button.MouseLeave:Connect(function()
+            Tween(Stroke, StrokeTweenInfo, {Transparency = 1})
+        end)
+        Button.MouseButton1Down:Connect(function()
+            Tween(Stroke, StrokeTweenInfo, {Color = ButtonDown})
+        end)
+        Button.MouseButton1Up:Connect(function()
+            Tween(Stroke, StrokeTweenInfo, {Color = ButtonHover})
+        end)
+        Button.Activated:Connect(Activated[Button.Text])
     end
-end)
+end
