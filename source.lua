@@ -1,5 +1,5 @@
 --! Nanocore Internal UI
---! Version: 3.3
+--! Version: 3.4
 --! Copyright (c) 2024 ttwiz_z
 
 
@@ -20,13 +20,26 @@ pcall(function()
 end)
 
 
+--? Services
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+
+
 --? Constants
+
+local Player = Players.LocalPlayer
 
 local ExecutorTweenInfo = TweenInfo.new(0.075)
 local StrokeTweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
 
 local ButtonHover = Color3.fromRGB(120, 120, 120)
 local ButtonDown = Color3.fromRGB(170, 170, 170)
+
+
+--? Instances
 
 local Executor = Instance.new("CanvasGroup")
 local UICorner = Instance.new("UICorner")
@@ -70,14 +83,13 @@ end
 
 local function Tween(Object, TweenInfo, Properties)
     if Object and typeof(Object) == "Instance" and TweenInfo and typeof(TweenInfo) == "TweenInfo" and Properties and type(Properties) == "table" then
-        game:GetService("TweenService"):Create(Object, TweenInfo, Properties):Play()
+        TweenService:Create(Object, TweenInfo, Properties):Play()
     end
 end
 
 local function SmoothDrag(Object)
     if Object and type(Object) == "userdata" then
-        local UserInputService = game:GetService("UserInputService")
-        local Toggle, Input, Start, StartPosition = nil, nil, nil, nil
+        local Toggle, Input, Start, StartPosition
         local function Update(Key)
             local Delta = Key.Position - Start
             local NewPosition = UDim2.new(StartPosition.X.Scale, StartPosition.X.Offset + Delta.X, StartPosition.Y.Scale, StartPosition.Y.Offset + Delta.Y)
@@ -4766,7 +4778,7 @@ function luaY:chunk(ls)
     self:leavelevel(ls)
 end
 
---# selene: allow(divide_by_zero, multiple_statements)
+--# selene: allow(divide_by_zero, multiple_statements, mixed_table)
 local bit = bit32
 local unpack = table.unpack or unpack
 
@@ -5867,22 +5879,19 @@ luaX:init()
 local LuaState = {}
 
 local function ExecuteCode(str, env)
-    local f, writer, buff = nil, nil, nil
+    local f, writer, buff
     env = env or getfenv(2)
-    local ran, error = xpcall(function()
+    local ran = xpcall(function()
         local zio = luaZ:init(luaZ:make_getS(str), nil)
-        if not zio then return nil, error end
         local func = luaY:parser(LuaState, zio, nil, "NanocoreVM")
         writer, buff = luaU:make_setS()
         luaU:dump(LuaState, func, writer, buff)
         f = load_lua_func(buff.data, env)
     end, function(err)
-        return string.format("%s\n\n--- Loadstring Stacktrace Begin --- \n%s\n--- Loadstring Stacktrace End --- \n", err, debug.traceback("", 2))
+        return warn(err)
     end)
     if ran then
         return f, buff.data
-    else
-        return nil, error
     end
 end
 
@@ -5890,18 +5899,17 @@ end
 --? Configuration
 
 task.spawn(AutoRename, Executor)
-local Setup = pcall(function()
-    Executor.Parent = game:GetService("CoreGui"):WaitForChild("RobloxGui", math.huge)
-end)
-if not Setup then
+xpcall(function()
+    Executor.Parent = CoreGui:WaitForChild("RobloxGui", math.huge)
+end, function()
     local Nanocore = Instance.new("ScreenGui")
     task.spawn(AutoRename, Nanocore)
     Nanocore.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     Nanocore.DisplayOrder = 9e8
     Nanocore.IgnoreGuiInset = true
-    Nanocore.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui", math.huge)
+    Nanocore.Parent = Player:WaitForChild("PlayerGui", math.huge)
     Executor.Parent = Nanocore
-end
+end)
 
 Executor.AnchorPoint = Vector2.new(0.5, 0.5)
 Executor.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
@@ -6036,14 +6044,14 @@ task.spawn(SmoothDrag, Executor)
 
 --? Logic
 
-local GUID = string.reverse(game:GetService("HttpService"):GenerateGUID(false))
+local Token = RandomString()
 local EQ = false
 
 pcall(function()
-    getfenv().loadstring(string.format("getfenv()[\"%s\"] = 0", GUID))()
-    if getfenv()[GUID] == 0 then
+    getfenv().loadstring(string.format("getfenv()[\"%s\"] = 0", Token))()
+    if getfenv()[Token] == 0 then
         EQ = true
-        getfenv()[GUID] = nil
+        getfenv()[Token] = nil
     end
 end)
 
@@ -6051,7 +6059,7 @@ if not EQ then
     getfenv().loadstring = ExecuteCode
 end
 
-GUID = nil
+Token = nil
 EQ = false
 
 local Activated = {
@@ -6059,7 +6067,9 @@ local Activated = {
         xpcall(function()
             getfenv().loadstring(Content.Text)()
         end, function(Error)
-            warn(Error)
+            if not string.find(Error, "attempt to call a nil value") then
+                warn(Error)
+            end
         end)
     end,
     Clear = function()
