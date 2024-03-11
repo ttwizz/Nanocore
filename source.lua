@@ -1,5 +1,5 @@
 --! Nanocore Internal UI
---! Version: 3.4
+--! Version: 3.5
 --! Copyright (c) 2024 ttwiz_z
 
 
@@ -6067,7 +6067,7 @@ local Activated = {
         xpcall(function()
             getfenv().loadstring(Content.Text)()
         end, function(Error)
-            if not string.find(Error, "attempt to call a nil value") then
+            if getfenv().loadstring == ExecuteCode and string.find(Error, "NanocoreVM") or getfenv().loadstring ~= ExecuteCode then
                 warn(Error)
             end
         end)
