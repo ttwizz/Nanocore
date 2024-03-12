@@ -1,5 +1,5 @@
 --! Nanocore Internal UI
---! Version: 3.5
+--! Version: 3.6
 --! Copyright (c) 2024 ttwiz_z
 
 
@@ -5875,10 +5875,10 @@ end
 --? Initialization
 
 luaX:init()
-
 local LuaState = {}
 
 local function ExecuteCode(str, env)
+    if not getfenv().NanocoreVM then getfenv().NanocoreVM = true end
     local f, writer, buff
     env = env or getfenv(2)
     local ran = xpcall(function()
@@ -6067,7 +6067,7 @@ local Activated = {
         xpcall(function()
             getfenv().loadstring(Content.Text)()
         end, function(Error)
-            if getfenv().loadstring == ExecuteCode and string.find(Error, "NanocoreVM") or getfenv().loadstring ~= ExecuteCode then
+            if getfenv().NanocoreVM and string.find(Error, "NanocoreVM") or not getfenv().NanocoreVM then
                 warn(Error)
             end
         end)
