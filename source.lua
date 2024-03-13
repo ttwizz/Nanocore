@@ -1,5 +1,5 @@
 --! Nanocore Internal UI
---! Version: 3.6
+--! Version: 3.7
 --! Copyright (c) 2024 ttwiz_z
 
 
@@ -73,7 +73,7 @@ end
 
 local function AutoRename(Object)
     while task.wait() do
-        if Object and typeof(Object) == "Instance" then
+        if Object and typeof(Object) == "Instance" and Object.Parent then
             Object.Name = RandomString()
         else
             break
