@@ -1,5 +1,5 @@
 --! Nanocore Internal UI
---! Version: 3.7
+--! Version: 3.8
 --! Copyright (c) 2024 ttwiz_z
 
 
@@ -124,7 +124,7 @@ end
 --? NanocoreVM
 
 --# selene: allow(incorrect_standard_library_use, multiple_statements, shadowing, unused_variable, empty_if, divide_by_zero, unbalanced_assignments)
---[[--------------------------------------------------------------------
+--[[
 
   lopcodes.lua
   Lua 5 virtual machine opcodes in Lua
@@ -136,9 +136,9 @@ end
 
   See the ChangeLog for more information.
 
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- Notes:
 -- * an Instruction is a table with OP, A, B, C, Bx elements; this
 --   makes the code easy to follow and should allow instruction handling
@@ -165,7 +165,7 @@ end
 -- * OP_SETLIST and OP_SETLISTO merged and extended
 -- * OP_VARARG is new
 -- * many changes to implementation of OpMode data
-----------------------------------------------------------------------]]
+]]
 
 local luaP = {}
 
@@ -186,7 +186,7 @@ local luaP = {}
   represented by 2*max), which is half the maximum for the corresponding
   unsigned argument.
 ===========================================================================
---]]
+]]
 
 luaP.OpMode = { iABC = 0, iABx = 1, iAsBx = 2 }  -- basic instruction format
 
@@ -227,7 +227,7 @@ luaP.MAXARG_C = math.ldexp(1, luaP.SIZE_C) - 1
 -- creates a mask with 'n' 0 bits at position 'p'
 -- MASK0(n,p) deleted, not required
 
---[[--------------------------------------------------------------------
+--[[
   Visual representation for reference:
 
    31    |    |     |            0      bit position
@@ -239,7 +239,7 @@ luaP.MAXARG_C = math.ldexp(1, luaP.SIZE_C) - 1
     |   [s]Bx   |  A  |  Opcode  |      iABx | iAsBx format
     +-----+-----+-----+----------+
 
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- the following macros help to manipulate instructions
@@ -363,7 +363,7 @@ luaP.NO_REG = luaP.MAXARG_A
 -- grep "ORDER OP" if you change these enums
 ------------------------------------------------------------------------
 
---[[--------------------------------------------------------------------
+--[[
 Lua virtual machine opcodes (enum OpCode):
 ------------------------------------------------------------------------
 name          args    description
@@ -408,7 +408,7 @@ OP_SETLIST    A B C   R(A)[(C-1)*FPF+i] := R(A+i), 1 <= i <= B
 OP_CLOSE      A       close all variables in the stack up to (>=) R(A)
 OP_CLOSURE    A Bx    R(A) := closure(KPROTO[Bx], R(A), ... ,R(A+n))
 OP_VARARG     A B     R(A), R(A+1), ..., R(A+B-1) = vararg
-----------------------------------------------------------------------]]
+]]
 
 luaP.opnames = {}  -- opcode names
 luaP.OpCode = {}   -- lookup name -> number
@@ -451,9 +451,9 @@ luaP.NUM_OPCODES = i
       (true or false).
   (*) All 'skips' (pc++) assume that next instruction is a jump
 ===========================================================================
---]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
   masks for instruction properties. The format is:
   bits 0-1: op mode
   bits 2-3: C arg mode
@@ -466,7 +466,7 @@ luaP.NUM_OPCODES = i
   OpArgU - argument is used
   OpArgR - argument is a register or a jump offset
   OpArgK - argument is a constant or register/constant
-----------------------------------------------------------------------]]
+]]
 
 -- was enum OpArgMask
 luaP.OpArgMask = { OpArgN = 0, OpArgU = 1, OpArgR = 2, OpArgK = 3 }
@@ -557,7 +557,7 @@ luaP.opmodes[0] =
     opmode(0, 1, "OpArgR", "OpArgN", "iABC")      -- OP_MOVE
 
 --# selene: allow(incorrect_standard_library_use, multiple_statements, shadowing, unused_variable, empty_if, divide_by_zero, unbalanced_assignments)
---[[--------------------------------------------------------------------
+--[[
 
   lzio.lua
   Lua buffered streams in Lua
@@ -569,9 +569,9 @@ luaP.opmodes[0] =
 
   See the ChangeLog for more information.
 
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- Notes:
 -- * EOZ is implemented as a string, "EOZ"
 -- * Format of z structure (ZIO)
@@ -599,7 +599,7 @@ luaP.opmodes[0] =
 -- * Chunkreader renamed to Reader (ditto with Chunkwriter)
 -- * Zio struct: no more name string, added Lua state for reader
 --   (however, Yueliang readers do not require a Lua state)
-----------------------------------------------------------------------]]
+]]
 
 local luaZ = {}
 
@@ -642,7 +642,7 @@ function luaZ:make_getF(filename)
     return buff
   end
 end
---]]
+]]
 ------------------------------------------------------------------------
 -- creates a zio input stream
 -- returns the ZIO structure, z
@@ -685,7 +685,7 @@ function luaZ:zgetc(z)
 end
 
 --# selene: allow(incorrect_standard_library_use, multiple_statements, shadowing, unused_variable, empty_if, divide_by_zero, unbalanced_assignments)
---[[--------------------------------------------------------------------
+--[[
 
   ldump.lua
   Save precompiled Lua chunks
@@ -697,9 +697,9 @@ end
 
   See the ChangeLog for more information.
 
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- Notes:
 -- * WARNING! byte order (little endian) and data type sizes for header
 --   signature values hard-coded; see luaU:header
@@ -741,7 +741,7 @@ end
 -- * luaU:dump returns a writer status code
 -- * chunk writer now implements status code because dumper uses it
 -- * luaU:endianness removed
-----------------------------------------------------------------------]]
+]]
 
 local luaU = {}
 
@@ -760,10 +760,10 @@ luaU.LUAC_VERSION    = 0x51     -- this is Lua 5.1
 luaU.LUAC_FORMAT     = 0        -- this is the official format
 luaU.LUAC_HEADERSIZE = 12       -- size of header of binary files
 
---[[--------------------------------------------------------------------
+--[[
 -- Additional functions to handle chunk writing
 -- * to use make_setS and make_setF, see test_ldump.lua elsewhere
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- create a chunk writer that writes to a string
@@ -804,7 +804,7 @@ function luaU:make_setF(filename)
       return 1
     end
   return writer, buff
-end--]]
+end]]
 
 ------------------------------------------------------------------------
 -- works like the lobject.h version except that TObject used in these
@@ -867,20 +867,20 @@ function luaU:from_int(x)
     return v
 end
 
---[[--------------------------------------------------------------------
+--[[
 -- Functions to make a binary chunk
 -- * many functions have the size parameter removed, since output is
 --   in the form of a string and some sizes are implicit or hard-coded
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- struct DumpState:
 --   L  -- lua_State (not used in this script)
 --   writer  -- lua_Writer (chunk writer function)
 --   data  -- void* (chunk writer context or data already written)
 --   strip  -- if true, don't write any debug information
 --   status  -- if non-zero, an error has occured
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- dumps a block of bytes
@@ -1060,7 +1060,7 @@ function luaU:dump(L, f, w, data, strip)
 end
 
 --# selene: allow(incorrect_standard_library_use, multiple_statements, shadowing, unused_variable, empty_if, divide_by_zero, unbalanced_assignments)
---[[--------------------------------------------------------------------
+--[[
 
   llex.lua
   Lua lexical analyzer in Lua
@@ -1072,9 +1072,9 @@ end
 
   See the ChangeLog for more information.
 
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- Notes:
 -- * intended to 'imitate' llex.c code; performance is not a concern
 -- * tokens are strings; code structure largely retained
@@ -1128,7 +1128,7 @@ end
 -- * luaX:llex: readname functionality has been folded in
 -- * luaX:llex: removed test for control characters
 --
---------------------------------------------------------------------]]
+]]
 
 local luaX = {}
 
@@ -1184,7 +1184,7 @@ TK_EOS <eof>]]
 
 -- NUM_RESERVED is not required; number of reserved words
 
---[[--------------------------------------------------------------------
+--[[
 -- Instead of passing seminfo, the Token struct (e.g. ls.t) is passed
 -- so that lexer functions can use its table element, ls.t.seminfo
 --
@@ -1207,7 +1207,7 @@ TK_EOS <eof>]]
 --   source  -- current source name
 --   decpoint -- locale decimal point
 --   nestlevel  -- level of nested non-terminals
-----------------------------------------------------------------------]]
+]]
 
 -- luaX.tokens (was luaX_tokens) is now a hash; see luaX:init
 
@@ -1272,11 +1272,11 @@ function luaX:chunkid(source, bufflen)
     return out
 end
 
---[[--------------------------------------------------------------------
+--[[
 -- Support functions for lexer
 -- * all lexer errors eventually reaches lexerror:
      syntaxerror -> lexerror
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- look up token and return keyword if found (also called by parser)
@@ -1366,9 +1366,9 @@ function luaX:setinput(L, ls, z, source)
     self:nextc(ls)  -- read first char
 end
 
---[[--------------------------------------------------------------------
+--[[
 -- LEXICAL ANALYZER
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- checks if current character read is found in the set 'set'
@@ -1852,7 +1852,7 @@ function luaX:llex(ls, Token)
 end
 
 --# selene: allow(incorrect_standard_library_use, multiple_statements, shadowing, unused_variable, empty_if, divide_by_zero, unbalanced_assignments)
---[[--------------------------------------------------------------------
+--[[
 
   lcode.lua
   Lua 5 code generator in Lua
@@ -1864,9 +1864,9 @@ end
 
   See the ChangeLog for more information.
 
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- Notes:
 -- * one function manipulate a pointer argument with a simple data type
 --   (can't be emulated by a table, ambiguous), now returns that value:
@@ -1907,7 +1907,7 @@ end
 -- * luaK:codebinop has been deleted
 -- * function luaK_setlist is new
 -- * OPR_MULT renamed to OPR_MUL
-----------------------------------------------------------------------]]
+]]
 
 local luaY
 local luaK = {}
@@ -1918,9 +1918,9 @@ local luaK = {}
 -- maximum stack for a Lua function
 luaK.MAXSTACK = 250  -- (from llimits.h)
 
---[[--------------------------------------------------------------------
+--[[
 -- other functions
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- emulation of TValue macros (these are from lobject.h)
@@ -1955,9 +1955,9 @@ function luaK:numunm(a) return -a end
 function luaK:numisnan(a) return not a == a end
 -- a NaN cannot equal another NaN
 
---[[--------------------------------------------------------------------
+--[[
 -- code generator functions
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- Marks the end of a patch list. It is an invalid value both as an absolute
@@ -2978,7 +2978,7 @@ function luaK:setlist(fs, base, nelems, tostore)
 end
 
 --# selene: allow(incorrect_standard_library_use, multiple_statements, shadowing, unused_variable, empty_if, divide_by_zero, unbalanced_assignments)
---[[--------------------------------------------------------------------
+--[[
 
   lparser.lua
   Lua 5 parser in Lua
@@ -2990,9 +2990,9 @@ end
 
   See the ChangeLog for more information.
 
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- Notes:
 -- * some unused C code that were not converted are kept as comments
 -- * LUA_COMPAT_VARARG option changed into a comment block
@@ -3047,11 +3047,11 @@ end
 -- * repeat, forbody statement implementation has major changes,
 --   mostly due to new scoping behaviour of local variables
 -- * OPR_MULT renamed to OPR_MUL
-----------------------------------------------------------------------]]
+]]
 
 luaY = {}
 
---[[--------------------------------------------------------------------
+--[[
 -- Expression descriptor
 -- * expkind changed to string constants; luaY:assignment was the only
 --   function to use a relational operator with this enumeration
@@ -3070,9 +3070,9 @@ luaY = {}
 -- VNONRELOC   -- info = result register
 -- VCALL       -- info = instruction pc
 -- VVARARG     -- info = instruction pc
-} ----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- * expdesc in Lua 5.1.x has a union u and another struct s; this Lua
 --   implementation ignores all instances of u and s usage
 -- struct expdesc:
@@ -3081,15 +3081,15 @@ luaY = {}
 --   nval -- (lua_Number)
 --   t  -- patch list of 'exit when true'
 --   f  -- patch list of 'exit when false'
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- struct upvaldesc:
 --   k  -- (lu_byte)
 --   info -- (lu_byte)
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- state needed to generate code for a given function
 -- struct FuncState:
 --   f  -- current function header (table: Proto)
@@ -3108,7 +3108,7 @@ luaY = {}
 --   nactvar  -- number of active local variables
 --   upvalues[LUAI_MAXUPVALUES]  -- upvalues (table: upvaldesc)
 --   actvar[LUAI_MAXVARS]  -- declared-variable stack
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- constants used by parser
@@ -3133,9 +3133,9 @@ luaY.VARARG_NEEDSARG = 4
 
 luaY.LUA_MULTRET = -1  -- (lua.h)
 
---[[--------------------------------------------------------------------
+--[[
 -- other functions
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- LUA_QL describes how error messages quote program elements.
@@ -3208,9 +3208,9 @@ function luaY:int2fb(x)
     end
 end
 
---[[--------------------------------------------------------------------
+--[[
 -- parser functions
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- true of the kind of expression produces multiple return values
@@ -3233,7 +3233,7 @@ function luaY:checklimit(fs, v, l, m)
     if v > l then self:errorlimit(fs, l, m) end
 end
 
---[[--------------------------------------------------------------------
+--[[
 -- nodes for block list (list of active blocks)
 -- struct BlockCnt:
 --   previous  -- chain (table: BlockCnt)
@@ -3241,7 +3241,7 @@ end
 --   nactvar  -- # active local variables outside the breakable structure
 --   upval  -- true if some variable in the block is an upvalue (boolean)
 --   isbreakable  -- true if 'block' is a loop (boolean)
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- prototypes for recursive non-terminal functions
@@ -3685,9 +3685,9 @@ function luaY:parser(L, z, buff, name)
     return funcstate.f
 end
 
---[[--------------------------------------------------------------------
+--[[
 -- GRAMMAR RULES
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- parse a function name suffix, for function call specifications
@@ -3715,18 +3715,18 @@ function luaY:yindex(ls, v)
     self:checknext(ls, "]")
 end
 
---[[--------------------------------------------------------------------
+--[[
 -- Rules for Constructors
-----------------------------------------------------------------------]]
+]]
 
---[[--------------------------------------------------------------------
+--[[
 -- struct ConsControl:
 --   v  -- last list item read (table: struct expdesc)
 --   t  -- table descriptor (table: struct expdesc)
 --   nh  -- total number of 'record' elements
 --   na  -- total number of array elements
 --   tostore  -- number of array elements pending to be stored
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- parse a table record (hash) field
@@ -3856,14 +3856,12 @@ function luaY:parlist(ls)
                 nparams = nparams + 1
             elseif c == "TK_DOTS" then  -- param -> `...'
                 luaX:next(ls)
-                -- [[
                 -- #if defined(LUA_COMPAT_VARARG)
                 -- use `arg' as default name
                 self:new_localvarliteral(ls, "arg", nparams)
                 nparams = nparams + 1
                 f.is_vararg = self.VARARG_HASARG + self.VARARG_NEEDSARG
                 -- #endif
-                --]]
                 f.is_vararg = f.is_vararg + self.VARARG_ISVARARG
             else
                 luaX:syntaxerror(ls, "<name> or "..self:LUA_QL("...").." expected")
@@ -3965,9 +3963,9 @@ function luaY:funcargs(ls, f)
     -- (unless changed) one result
 end
 
---[[--------------------------------------------------------------------
+--[[
 -- Expression parsing
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- parses an expression in parentheses or a single variable
@@ -4202,9 +4200,9 @@ end
 
 -- }====================================================================
 
---[[--------------------------------------------------------------------
+--[[
 -- Rules for Statements
-----------------------------------------------------------------------]]
+]]
 
 ------------------------------------------------------------------------
 -- checks next token, used as a look-ahead
@@ -5878,7 +5876,9 @@ luaX:init()
 local LuaState = {}
 
 local function ExecuteCode(str, env)
-    if not getfenv().NanocoreVM then getfenv().NanocoreVM = true end
+    if not getfenv().NanocoreVM then
+        getfenv().NanocoreVM = true
+    end
     local f, writer, buff
     env = env or getfenv(2)
     local ran = xpcall(function()
@@ -6044,7 +6044,7 @@ task.spawn(SmoothDrag, Executor)
 
 --? Logic
 
-local Token = RandomString()
+local Token = string.upper(RandomString())
 local EQ = false
 
 pcall(function()
