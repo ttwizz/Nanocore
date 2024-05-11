@@ -1,7 +1,18 @@
---! Nanocore Internal UI
---! Version: 3.8
---! Copyright (c) 2024 ttwiz_z
+--!nocheck
 
+
+--! Nanocore Internal UI
+--! Release 3.9
+
+--! Author: ttwiz_z (ttwizz)
+--! License: MIT
+--! GitHub: https://github.com/ttwizz/Nanocore
+
+--! Issues: https://github.com/ttwizz/Nanocore/issues
+--! Pull requests: https://github.com/ttwizz/Nanocore/pulls
+--! Discussions: https://github.com/ttwizz/Nanocore/discussions
+
+--! ttwizz.su/pix
 
 
 --? Script Hider
@@ -13,9 +24,6 @@ pcall(function()
         _script_.Parent = nil
         _script_ = nil
         getfenv().script = nil
-        for _ = 0, 1 do
-            getfenv(_).script = nil
-        end
     end
 end)
 
@@ -63,10 +71,10 @@ local UIStroke_3 = Instance.new("UIStroke")
 --? Functions
 
 local function RandomString()
-    local Length = math.random(10, 20)
+    local Length = math.random(11, 22)
     local Array = {}
     for Index = 1, Length do
-        Array[Index] = string.char(math.random(32, 126))
+        Array[Index] = string.char(math.random(35, 91))
     end
     return table.concat(Array)
 end
@@ -842,7 +850,7 @@ function luaU:from_double(x)
         mantissa = (mantissa * 2 - 1) * math.ldexp(0.5, 53)
         exponent = exponent + 1022
     end
-    local v, byte = "" -- convert to bytes
+    local v, byte = "", nil -- convert to bytes
     x = math.floor(mantissa)
     for i = 1,6 do
         x, byte = grab_byte(x); v = v..byte -- 47:0
@@ -1374,7 +1382,7 @@ end
 -- checks if current character read is found in the set 'set'
 ------------------------------------------------------------------------
 function luaX:check_next(ls, set)
-    if not string.find(set, ls.current, 1, 1) then
+    if not string.find(set, ls.current, 1) then
         return false
     end
     self:save_and_next(ls)
@@ -1909,7 +1917,7 @@ end
 -- * OPR_MULT renamed to OPR_MUL
 ]]
 
-local luaY
+local luaY = {}
 local luaK = {}
 
 ------------------------------------------------------------------------
@@ -1952,7 +1960,7 @@ function luaK:nummod(a, b) return a % b end
 -- ((a) - floor((a)/(b))*(b)) /* actual, for reference */
 function luaK:numpow(a, b) return a ^ b end
 function luaK:numunm(a) return -a end
-function luaK:numisnan(a) return not a == a end
+function luaK:numisnan(a) return a ~= a end
 -- a NaN cannot equal another NaN
 
 --[[
@@ -3048,8 +3056,6 @@ end
 --   mostly due to new scoping behaviour of local variables
 -- * OPR_MULT renamed to OPR_MUL
 ]]
-
-luaY = {}
 
 --[[
 -- Expression descriptor
@@ -4777,6 +4783,24 @@ function luaY:chunk(ls)
 end
 
 --# selene: allow(divide_by_zero, multiple_statements, mixed_table)
+--[[
+  FiOne
+  Copyright (C) 2021  Rerumu
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+]]
+
 local bit = bit32
 local unpack = table.unpack or unpack
 
@@ -5879,17 +5903,18 @@ local function ExecuteCode(str, env)
     if not getfenv().NanocoreVM then
         getfenv().NanocoreVM = true
     end
+
     local f, writer, buff
-    env = env or getfenv(2)
     local ran = xpcall(function()
         local zio = luaZ:init(luaZ:make_getS(str), nil)
         local func = luaY:parser(LuaState, zio, nil, "NanocoreVM")
         writer, buff = luaU:make_setS()
         luaU:dump(LuaState, func, writer, buff)
-        f = load_lua_func(buff.data, env)
+        f = load_lua_func(buff.data, env or getfenv())
     end, function(err)
         return warn(err)
     end)
+
     if ran then
         return f, buff.data
     end
@@ -6044,7 +6069,7 @@ task.spawn(SmoothDrag, Executor)
 
 --? Logic
 
-local Token = string.upper(RandomString())
+local Token = RandomString()
 local EQ = false
 
 pcall(function()
