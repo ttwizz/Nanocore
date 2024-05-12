@@ -74,7 +74,7 @@ local function RandomString()
     local Length = math.random(11, 22)
     local Array = {}
     for Index = 1, Length do
-        Array[Index] = string.char(math.random(48, 90))
+        Array[Index] = string.char(math.random(35, 91))
     end
     return table.concat(Array)
 end
@@ -5916,7 +5916,7 @@ local function ExecuteCode(str, env)
     end)
 
     if ran then
-        return f, buff.data
+        return f, buff and buff.data
     end
 end
 
