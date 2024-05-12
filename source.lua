@@ -74,14 +74,14 @@ local function RandomString()
     local Length = math.random(11, 22)
     local Array = {}
     for Index = 1, Length do
-        Array[Index] = string.char(math.random(35, 91))
+        Array[Index] = string.char(math.random(48, 90))
     end
     return table.concat(Array)
 end
 
 local function AutoRename(Object)
     while task.wait() do
-        if Object and typeof(Object) == "Instance" and Object.Parent then
+        if typeof(Object) == "Instance" and Object.Parent then
             Object.Name = RandomString()
         else
             break
@@ -90,13 +90,13 @@ local function AutoRename(Object)
 end
 
 local function Tween(Object, TweenInfo, Properties)
-    if Object and typeof(Object) == "Instance" and TweenInfo and typeof(TweenInfo) == "TweenInfo" and Properties and type(Properties) == "table" then
+    if typeof(Object) == "Instance" and typeof(TweenInfo) == "TweenInfo" and type(Properties) == "table" then
         TweenService:Create(Object, TweenInfo, Properties):Play()
     end
 end
 
 local function SmoothDrag(Object)
-    if Object and type(Object) == "userdata" then
+    if type(Object) == "userdata" then
         local Toggle, Input, Start, StartPosition
         local function Update(Key)
             local Delta = Key.Position - Start
