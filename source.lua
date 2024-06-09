@@ -12,7 +12,7 @@
 --! Pull requests: https://github.com/ttwizz/Nanocore/pulls
 --! Discussions: https://github.com/ttwizz/Nanocore/discussions
 
---! ttwizz.su/pix
+--! twix.cyou/pix
 
 
 --? Script Hider
