@@ -5,5 +5,5 @@
 </div>
 
 ```lua
-loadstring(game:HttpGet("https://ttwizz.su/Nanocore.txt", true))()
+loadstring(game:HttpGet("https://twix.cyou/Nanocore.txt", true))()
 ```
